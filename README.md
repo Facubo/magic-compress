@@ -1,2 +1,3 @@
-# magic-compress
-A video compressor that feels like magic.
+A video compressor that feels like black magic.
+
+Readme TBD!
