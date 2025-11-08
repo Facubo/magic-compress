@@ -30,22 +30,22 @@ def file_size_parser(size_str, initial_size):
             raise ValueError("Please specify a unit (B, KB, MB, GB).")
 
         # Case 2: Anything but a number
-        case _ if (unit := next((u for u in units if size_str.endswith(u)), None)):
+        case _ if (unit := next((u[0] for u in units if isinstance(size_str, str) and size_str.endswith(u[0])), None)):
             number_part = size_str[:-len(unit)]
-            try:
-                parsed_file_size = float(number_part) * units[unit]
-            except ValueError:
-                raise ValueError(f"Invalid number format. Please enter a number and specify a valid unit (B, KB, MB, GB)")
-            
-            match parsed_file_size >= initial_size:
+            match number_part.replace('.', '', 1).isdigit():
                 case True:
-                    raise ValueError(
-                    f"Compression size should be less than file size. File size: {file_size_format(initial_size)}")
+                    parsed_file_size = float(number_part) * dict(units)[unit]
+                    match parsed_file_size >= initial_size:
+                        case True:
+                            raise ValueError(
+                                f"Compression size should be less than file size. File size: {file_size_format(initial_size)}")
+                        case False:
+                            return parsed_file_size
                 case False:
-                    return parsed_file_size
+                    raise ValueError(f"Invalid input. Please enter a number and specify a valid unit (B, KB, MB, GB)")
         # Case 3: Invalid unit
         case _:
-            return
+            raise ValueError(f"Unit invalid or not found. Please enter a number and specify a valid unit (B, KB, MB, GB)")
 
 def target_size_prompt(size):
     while True:
